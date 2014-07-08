@@ -1,0 +1,11 @@
+{
+    "Server": {
+        "srvPort": 1337
+    },
+    "Mongoose": {
+        "host": "mongodb1.alwaysdata.com",
+        "db": "plomb_troubleshooter_api_0",
+        "user": "plomb_troubleshooter_api_0_admin",
+        "pass": "dfgdfg"
+    }
+}

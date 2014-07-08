@@ -1,21 +1,19 @@
-
 /**
  * Module dependencies.
  */
 
 var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , mongoose = require('mongoose')
-  , path = require('path');
-
-var app = express();
+    , rek = require('rekuire')
+    , SRV_CONFIG = require('config').Server
+    , log = rek('libs/log')(module)
+    , routes = require('./routes')
+    , user = require('./routes/user') //Loads the Api routes of user
+    , http = require('http')
+    , path = require('path')
+    , FeedModel = require('./db/mongoose').FeedModel
+    , app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 3000);
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
@@ -28,11 +26,30 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+app.use(function(req, res, next){
+    res.status(404);
+    log.debug('Not found URL: %s',req.url);
+    res.send({ error: 'Not found' });
+    return;
+});
+
+app.use(function(err, req, res, next){
+    res.status(err.status || 500);
+    log.error('Internal error(%d): %s',res.statusCode,err.message);
+    res.send({ error: err.message });
+    return;
+});
+
+//Routes
+
 app.get('/', routes.index);
 app.get('/users', user.list);
-app.get('/api/feeds', routes.api.feeds.all);
-//app.get('/api/feeds/:id', routes.api.feeds.byid);
 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+//Execution of api related routes see routes/api/index.js for more infos
+
+var apiRoutes = require('./routes/api')
+apiRoutes(app);
+
+http.createServer(app).listen(SRV_CONFIG.srvPort, function(){
+  log.info("Express server listening on port " + SRV_CONFIG.srvPort);
 });

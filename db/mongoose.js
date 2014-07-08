@@ -1,35 +1,23 @@
-var mongoose    = require('mongoose');
+var mongoose = require('mongoose')
+    , rek = require('rekuire')
+    , DB_CONFIG = require('config').Mongoose
+    , log = rek('libs/log')(module)
+    , UserModel = require('./userModel').UserModel //userModel defines a user in db
+    , FeedModel = require('./feedModel').FeedModel; //feedModel defines a feed in db
+
+//connect to the db according to /config.json
+mongoose.connect('mongodb://' + DB_CONFIG.user + ':' + DB_CONFIG.pass + '@' + DB_CONFIG.host +'/' + DB_CONFIG.db);
 
 var db = mongoose.connection;
 
-var Schema = mongoose.Schema;
-
-//Schemas
-//
-
-var imageSchema = new Schema({
-    kind: {
-        type: String,
-        enumerate: ['main', 'description'],
-        required: true
-    },
-    url: { type: String, required: true }
+db.on('error', function (err) {
+    log.error('connection error:', err.message);
+});
+db.once('open', function callback () {
+    log.info("Connected to DB!");
 });
 
-var videoSchema = new Schema({
-    url: { type: String, required: true }
-});
-
-var feedSchema = new Schema({
-    title: { type: String, required: true },
-    content: { type: String, required: true },
-    created: { type: Date, default: Date.now },
-    modified: { type: Date, default: Date.now },
-    images: [imageSchema],
-    videos: [videoSchema],
-    author: [userSchema]
-});
-
-var FeedModel = mongoose.model('FeedModel', feedSchema);
+// Models export
 
 module.exports.FeedModel = FeedModel;
+module.exports.UserModel = UserModel

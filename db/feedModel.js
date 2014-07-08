@@ -1,7 +1,10 @@
-var mongoose = require('mongoose')
+var rek = require('rekuire')
+    , log = rek('libs/log')(module)
+    , mongoose = require('mongoose')
     , Schema = mongoose.Schema
     , uniqueValidator = require('mongoose-unique-validator')
-    , validate = require('mongoose-validate');
+    , validate = require('mongoose-validate') //embedded validation rules, need to be enhanced
+    , UserModel = rek('db/mongoose').UserModel;
 
 
 //Schemas
@@ -27,12 +30,14 @@ var feedSchema = new Schema({
     , modified: { type: Date, default: Date.now }
     , images: [imageSchema]
     , videos: [videoSchema]
-    author: [userSchema]
+    , author: [UserModel]
 });
 
 //Validation
+//Here we need all validation rules for above schemes
+//for instance: min length etc...
 
-feedSchema.plugin(uniqueValidator);
+feedSchema.plugin(uniqueValidator); //Test if the entry is unique in db
 
 var FeedModel = mongoose.model('FeedModel', feedSchema);
 module.exports.FeedModel = FeedModel;

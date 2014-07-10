@@ -11,6 +11,14 @@ var express = require('express')
     , http = require('http')
     , path = require('path')
     , FeedModel = require('./db/mongoose').FeedModel
+    //Loads Authentication requirements
+    , passport = rekuire('libs/passport')
+    , morgan = require('morgan')
+    , cookieParser = require('cookie-parser')
+    , bodyParser = require('body-parser')
+    , session = require('express-session')
+    , flash = require('connect-flash')
+    //Load express
     , app = express();
 
 app.configure(function(){
@@ -18,6 +26,11 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+//required for passport
+  app.use(session({ secret: '59c60b8c4b' })); // session secret
+  app.use(passport.initialize());
+  app.use(passport.session()); // persistent login sessions
+ app.use(flash()); // use connect-flash for flash messages stored in session
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });
@@ -48,7 +61,7 @@ app.get('/users', user.list);
 //Execution of api related routes see routes/api/index.js for more infos
 
 var apiRoutes = require('./routes/api')
-apiRoutes(app);
+apiRoutes(app, passport);
 
 http.createServer(app).listen(SRV_CONFIG.srvPort, function(){
   log.info("Express server listening on port " + SRV_CONFIG.srvPort);

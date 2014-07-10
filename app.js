@@ -12,7 +12,7 @@ var express = require('express')
     , path = require('path')
     , FeedModel = require('./db/mongoose').FeedModel
     //Loads Authentication requirements
-    , passport = rekuire('libs/passport')
+    , passport = require('passport')
     , morgan = require('morgan')
     , cookieParser = require('cookie-parser')
     , bodyParser = require('body-parser')
@@ -20,6 +20,9 @@ var express = require('express')
     , flash = require('connect-flash')
     //Load express
     , app = express();
+
+//Loads authentification config
+rek('libs/passport')(passport);
 
 app.configure(function(){
   app.use(express.favicon());
@@ -60,7 +63,7 @@ app.get('/users', user.list);
 
 //Execution of api related routes see routes/api/index.js for more infos
 
-var apiRoutes = require('./routes/api')
+var apiRoutes = rek('routes/api')
 apiRoutes(app, passport);
 
 http.createServer(app).listen(SRV_CONFIG.srvPort, function(){

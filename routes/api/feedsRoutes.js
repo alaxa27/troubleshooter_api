@@ -6,9 +6,10 @@ var rek = require('rekuire')
 //functions used when /api/feeds is opened in the browser RESTful services
 
 module.exports = function(app) {
-    app.get('/api/feeds', function(req, res){ //return json of all feeds
+    app.get('/feeds', function(req, res){ //return json of all feeds
         return FeedModel.find(function(err, feeds) {
             if (!err) {
+                res.statusCode = 200;
                 res.send(feeds);
             } else {
                 log.error(err);
@@ -17,7 +18,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/api/feeds', function(req, res){ //post a new feed into db according to received Json
+    app.post('/feeds', function(req, res){ //post a new feed into db according to received Json
         var now = new Date();
         var feed = new FeedModel({
             title: req.body.title
@@ -41,12 +42,12 @@ module.exports = function(app) {
         });
     });
 
-    app.get('/api/feeds/:id', function(req, res){ //display a single feed
+    app.get('/feeds/:id', function(req, res){ //display a single feed
         return FeedModel.findById(req.params.id, function(err, feed) {
             if (!feed) {
                 res.statusCode = 404;
                 log.error("404 " + err);
-                return ({ error: 'not found' });
+                return (res.send({ error: 'not found' }));
             }
             if (!err) {
                 return (res.send(feed));
@@ -57,7 +58,7 @@ module.exports = function(app) {
         });
     });
 
-    app.delete('/api/feeds/:id', function(req, res){ //Delete a single feed
+    app.delete('/feeds/:id', function(req, res){ //Delete a single feed
     return FeedModel.findById(req.params.id, function (err, feed) {
             if (!feed) {
                 res.statusCode = 404;
@@ -76,7 +77,7 @@ module.exports = function(app) {
         });
     });
 
-    app.put('/api/feeds/:id', function(req, res){ // Modify single feed
+    app.put('/feeds/:id', function(req, res){ // Modify single feed
         return FeedModel.findById(req.params.id, function (err, feed) {
             if (!feed) {
                 res.statusCode = 404;

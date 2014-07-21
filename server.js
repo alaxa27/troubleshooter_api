@@ -29,13 +29,17 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(express.cookieParser());
 //required for passport
   app.use(session({ secret: '59c60b8c4b' })); // session secret
   app.use(passport.initialize());
   app.use(passport.session()); // persistent login sessions
  app.use(flash()); // use connect-flash for flash messages stored in session
-  app.use(app.router);
+  app.use('/api', app.router);
   app.use(express.static(path.join(__dirname, 'public')));
+//Enabling CORS
+  var cors = require('./libs/cors');
+  app.use(cors);
 });
 
 app.configure('development', function(){
@@ -56,10 +60,11 @@ app.use(function(err, req, res, next){
     return;
 });
 
+
+
 //Routes
 
 app.get('/', routes.index);
-app.get('/users', user.list);
 
 //Execution of api related routes see routes/api/index.js for more infos
 

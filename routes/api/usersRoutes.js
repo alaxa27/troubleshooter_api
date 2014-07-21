@@ -1,14 +1,14 @@
-var rek = require('require')
+var rek = require('rekuire')
     , log = rek('libs/log')(module)
     , UserModel = rek('db/mongoose.js').UserModel;
     
 module.exports = function(app, passport) {
     
-    //Return list of users with their profile infos
-    app.get('/api/users', isAuthorized , function(req, res) {
-        return UserModel.find(function(err, users) {
+    //Return list of user with their profile infos
+    app.get('/user/list', isAuthorized , function(req, res) {
+        return UserModel.find(function(err, user) {
             if (!err) { //check here if client is logged as admin
-                res.send(users);
+                res.send(user);
             } else {
                 log.error(err);
                 res.send({error: err});
@@ -17,30 +17,32 @@ module.exports = function(app, passport) {
     });
 
     //Return the active user profile
-    app.get('/api/users/profile', isAuthorized(1), function(req, res) {
-        return res.send({'user': req.user});
+    app.get('/user/me', isAuthorized, function(req, res) {
+        return res.send({'email': req.user.email
+                        , 'password': req.user.password
+        });
     });
 
     //Handles the login credentials
-    app.post('/api/users/signin', function(req, res) {
+    app.post('/user/signin', function(req, res) {
 
     });
 
     //Handles logOut
-    app.get('/api/users/logout', function(req, res) {
+    app.get('/user/logout', function(req, res) {
         req.logout
         res.statusCode = 200;
         return res.send({ status: 'OK' });
     });
 
     //Handles the signup informations
-    app.post('/api/users/signup', function(req, res) {
+    app.post('/user/signup', function(req, res) {
 
     });
 }
 
 var isAuthorized = function(req, res, next) {
-    if (req.isAuthenticated()) {
+    if (req.user) {
 /*
         //Checks if user has the rights to continue
         if (user.rights.level >= levelRequired) {

@@ -6,7 +6,12 @@ var rek = require('rekuire')
 //functions used when /api/feeds is opened in the browser RESTful services
 
 module.exports = function(app) {
-    app.get('/feeds', function(req, res){ //return json of all feeds
+//Enabling CORS
+//Cross Domain Allow(Obligation in APIs)
+var cors = require('cors');
+/////////////////////////////////////
+
+    app.get('/feeds', cors(), function(req, res){ //return json of all feeds
         return FeedModel.find(function(err, feeds) {
             if (!err) {
                 res.statusCode = 200;

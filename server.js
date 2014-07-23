@@ -60,11 +60,6 @@ app.use(function(err, req, res, next){
 });
 
 
-//Enabling CORS
-//Cross Domain Allow(Obligation in APIs)
-var cors = require('cors');
-app.use(cors());
-/////////////////////////////////////
 
 //Routes
 

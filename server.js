@@ -6,10 +6,12 @@ var express = require('express')
     , rek = require('rekuire')
     , SRV_CONFIG = require('config').Server
     , log = rek('libs/log')(module)
-    , routes = require('./routes')
-    , user = require('./routes/user') //Loads the Api routes of user
     , http = require('http')
     , path = require('path')
+    //Routes
+    , routes = require('./routes')
+    , user = require('./routes/user') //Loads the Api routes of user
+    //Models
     , FeedModel = require('./db/mongoose').FeedModel
     //Loads Authentication requirements
     , passport = require('passport')
@@ -37,9 +39,6 @@ app.configure(function(){
  app.use(flash()); // use connect-flash for flash messages stored in session
   app.use('/api', app.router);
   app.use(express.static(path.join(__dirname, 'public')));
-//Enabling CORS
-  var cors = require('./libs/cors');
-  app.use(cors);
 });
 
 app.configure('development', function(){
@@ -61,15 +60,20 @@ app.use(function(err, req, res, next){
 });
 
 
+//Enabling CORS
+//Cross Domain Allow(Obligation in APIs)
+var cors = require('cors');
+app.use(cors());
+/////////////////////////////////////
 
 //Routes
 
 app.get('/', routes.index);
 
 //Execution of api related routes see routes/api/index.js for more infos
-
 var apiRoutes = rek('routes/api')
 apiRoutes(app, passport);
+////////////////////////////////////
 
 http.createServer(app).listen(SRV_CONFIG.srvPort, function(){
   log.info("Express server listening on port " + SRV_CONFIG.srvPort);

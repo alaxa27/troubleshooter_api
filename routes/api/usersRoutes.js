@@ -5,7 +5,7 @@ var rek = require('rekuire')
 module.exports = function(app, passport) {
     
     //Return list of user with their profile infos
-    app.get('/user/list', isAuthorized , function(req, res) {
+var getUsersList = function(req, res) {
         return UserModel.find(function(err, user) {
             if (!err) { //check here if client is logged as admin
                 res.send(user);
@@ -17,14 +17,14 @@ module.exports = function(app, passport) {
     });
 
     //Return the active user profile
-    app.get('/user/me', isAuthorized, function(req, res) {
+ function(req, res) {
         return res.send({'email': req.user.email
                         , 'password': req.user.password
         });
     });
 
     //Handles the login credentials
-    app.post('/user/signin', function(req, res) {
+ function(req, res) {
 
     });
 
@@ -35,10 +35,12 @@ module.exports = function(app, passport) {
         return res.send({ status: 'OK' });
     });
 
-    //Handles the signup informations
-    app.post('/user/signup', function(req, res) {
-
-    });
+    // Process the signup form
+    app.post('/signup', passport.authenticate('local-signup', {
+        successRedirect : '/profile', // redirect to the secure profile section
+        failureRedirect : '/signup', // redirect back to the signup page if there is an error
+        failureFlash : true // allow flash messages
+    }));
 }
 
 var isAuthorized = function(req, res, next) {

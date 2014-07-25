@@ -8,11 +8,6 @@ var express = require('express')
     , log = rek('libs/log')(module)
     , http = require('http')
     , path = require('path')
-    //Routes
-    , routes = require('./routes')
-    , user = require('./routes/user') //Loads the Api routes of user
-    //Models
-    , FeedModel = require('./db/mongoose').FeedModel
     //Loads Authentication requirements
     , passport = require('passport')
     , morgan = require('morgan')
@@ -20,8 +15,9 @@ var express = require('express')
     , bodyParser = require('body-parser')
     , session = require('express-session')
     , flash = require('connect-flash')
-    //Load express
-    , app = express();
+
+//Load express
+var app = express();
 
 //Loads authentification config
 rek('libs/passport')(passport);
@@ -60,14 +56,22 @@ app.use(function(err, req, res, next){
 });
 
 
-
 //Routes
-
-app.get('/', routes.index);
-
 //Execution of api related routes see routes/api/index.js for more infos
-var apiRoutes = rek('routes/api')
-apiRoutes(app, passport);
+//
+////////////////////////////////
+var feedsHandlers = rek('routes/api/feedsHandlers')
+    , userHandlers = rek('routes/api/userHandlers')
+    , authHandlers = rek('routes/api/authHandlers'); 
+
+var handlers = {
+    feeds: new feedsHandlers
+    , user: new userHandlers
+    , auth: new authHandlers
+}
+
+var apiRoutes = rek('routes/api');
+apiRoutes(app, passport, handlers);
 ////////////////////////////////////
 
 http.createServer(app).listen(SRV_CONFIG.srvPort, function(){
